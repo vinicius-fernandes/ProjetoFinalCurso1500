@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,94 +10,90 @@ using ProjetoFinalCurso1500.Models;
 
 namespace ProjetoFinalCurso1500.Controllers
 {
-    public class CarsController : Controller
+    public class ClientsController : Controller
     {
         private readonly ProjetoFinalCurso1500Context _context;
-        private readonly IMapper _mapper;
-        public CarsController(ProjetoFinalCurso1500Context context, IMapper mapper)
+
+        public ClientsController(ProjetoFinalCurso1500Context context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        // GET: Cars
+        // GET: Clients
         public async Task<IActionResult> Index()
         {
-            var projetoFinalCurso1500Context = _context.Car.Include(c => c.Concessionaire);
+            var projetoFinalCurso1500Context = _context.Client.Include(c => c.User);
             return View(await projetoFinalCurso1500Context.ToListAsync());
         }
 
-        // GET: Cars/Details/5
+        // GET: Clients/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.Client == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car
-                .Include(c => c.Concessionaire)
+            var client = await _context.Client
+                .Include(c => c.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (car == null)
+            if (client == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(client);
         }
 
-        // GET: Cars/Create
+        // GET: Clients/Create
         public IActionResult Create()
         {
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name");
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
-        // POST: Cars/Create
+        // POST: Clients/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
+        public async Task<IActionResult> Create([Bind("Id,UserId")] Client client)
         {
             if (ModelState.IsValid)
             {
-                var car = _mapper.Map<Car>(carDTO);
-                car.Id = Guid.NewGuid().ToString();
-                _context.Add(car);
+                _context.Add(client);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
-            return View(carDTO);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", client.UserId);
+            return View(client);
         }
 
-        // GET: Cars/Edit/5
+        // GET: Clients/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.Client == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car.FindAsync(id);
-            if (car == null)
+            var client = await _context.Client.FindAsync(id);
+            if (client == null)
             {
                 return NotFound();
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", car.IdConcessionaire);
-            return View(_mapper.Map<CarDTO>(car));
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", client.UserId);
+            return View(client);
         }
 
-        // POST: Cars/Edit/5
+        // POST: Clients/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,UserId")] Client client)
         {
-            var car = _context.Car.Find(id);
-            if (car ==null)
+            if (id != client.Id)
             {
                 return NotFound();
             }
@@ -107,13 +102,12 @@ namespace ProjetoFinalCurso1500.Controllers
             {
                 try
                 {
-                    _mapper.Map<CarDTO, Car>(carDTO, car);
-                    _context.Update(car);
+                    _context.Update(client);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CarExists(id))
+                    if (!ClientExists(client.Id))
                     {
                         return NotFound();
                     }
@@ -124,51 +118,51 @@ namespace ProjetoFinalCurso1500.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
-            return View(car);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", client.UserId);
+            return View(client);
         }
 
-        // GET: Cars/Delete/5
+        // GET: Clients/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.Client == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car
-                .Include(c => c.Concessionaire)
+            var client = await _context.Client
+                .Include(c => c.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (car == null)
+            if (client == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(client);
         }
 
-        // POST: Cars/Delete/5
+        // POST: Clients/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Car == null)
+            if (_context.Client == null)
             {
-                return Problem("Entity set 'ProjetoFinalCurso1500Context.Car'  is null.");
+                return Problem("Entity set 'ProjetoFinalCurso1500Context.Client'  is null.");
             }
-            var car = await _context.Car.FindAsync(id);
-            if (car != null)
+            var client = await _context.Client.FindAsync(id);
+            if (client != null)
             {
-                _context.Car.Remove(car);
+                _context.Client.Remove(client);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CarExists(string id)
+        private bool ClientExists(string id)
         {
-          return (_context.Car?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Client?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

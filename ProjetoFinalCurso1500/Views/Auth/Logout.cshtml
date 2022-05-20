@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Logout";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+   <h1>@ViewData["Title"]</h1>
+    @{
+        if (User.Identity.IsAuthenticated)
+        {
+            <form class="form-inline"  asp-page="/Auth/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                <button type="submit" class="nav-link btn btn-danger text-white">Clique aqui para efetuar o logout</button>
+            </form>
+        }
+        else
+        {
+            <p>Você efetuou o logout com sucesso.</p>
+        }
+    }

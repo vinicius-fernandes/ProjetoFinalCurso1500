@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoFinalCurso1500.Data;
 
@@ -11,9 +12,10 @@ using ProjetoFinalCurso1500.Data;
 namespace ProjetoFinalCurso1500.Migrations
 {
     [DbContext(typeof(ProjetoFinalCurso1500Context))]
-    partial class ProjetoFinalCurso1500ContextModelSnapshot : ModelSnapshot
+    [Migration("20220520145518_NameAsUserParam")]
+    partial class NameAsUserParam
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -11,94 +11,94 @@ using ProjetoFinalCurso1500.Models;
 
 namespace ProjetoFinalCurso1500.Controllers
 {
-    public class CarsController : Controller
+    public class ConcessionairesController : Controller
     {
         private readonly ProjetoFinalCurso1500Context _context;
         private readonly IMapper _mapper;
-        public CarsController(ProjetoFinalCurso1500Context context, IMapper mapper)
+
+        public ConcessionairesController(ProjetoFinalCurso1500Context context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        // GET: Cars
+        // GET: Concessionaires
         public async Task<IActionResult> Index()
         {
-            var projetoFinalCurso1500Context = _context.Car.Include(c => c.Concessionaire);
-            return View(await projetoFinalCurso1500Context.ToListAsync());
+              return _context.Concessionaires != null ? 
+                          View(await _context.Concessionaires.ToListAsync()) :
+                          Problem("Entity set 'ProjetoFinalCurso1500Context.Concessionaires'  is null.");
         }
 
-        // GET: Cars/Details/5
+        // GET: Concessionaires/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.Concessionaires == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car
-                .Include(c => c.Concessionaire)
+            var concessionaire = await _context.Concessionaires
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (car == null)
+            if (concessionaire == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(concessionaire);
         }
 
-        // GET: Cars/Create
+        // GET: Concessionaires/Create
         public IActionResult Create()
         {
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name");
             return View();
         }
 
-        // POST: Cars/Create
+        // POST: Concessionaires/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
+        public async Task<IActionResult> Create([Bind("Name")] ConcessionaireDTO concessionaireDTO)
         {
             if (ModelState.IsValid)
             {
-                var car = _mapper.Map<Car>(carDTO);
-                car.Id = Guid.NewGuid().ToString();
-                _context.Add(car);
+                var concessionaire =  _mapper.Map<Concessionaire>(concessionaireDTO);
+                concessionaire.Id = Guid.NewGuid().ToString();
+                _context.Add(concessionaire);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
-            return View(carDTO);
+            return View(concessionaireDTO);
         }
 
-        // GET: Cars/Edit/5
+        // GET: Concessionaires/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.Concessionaires == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car.FindAsync(id);
-            if (car == null)
+            var concessionaire = await _context.Concessionaires.FindAsync(id);
+            if (concessionaire == null)
             {
                 return NotFound();
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", car.IdConcessionaire);
-            return View(_mapper.Map<CarDTO>(car));
+
+
+            return View(_mapper.Map<ConcessionaireDTO>(concessionaire) );
         }
 
-        // POST: Cars/Edit/5
+        // POST: Concessionaires/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
+        public async Task<IActionResult> Edit(string id, [Bind("Name")] ConcessionaireDTO concessionaireDTO)
         {
-            var car = _context.Car.Find(id);
-            if (car ==null)
+            var concessionaire = _context.Concessionaires.Find(id);
+            if (concessionaire==null)
             {
                 return NotFound();
             }
@@ -107,13 +107,13 @@ namespace ProjetoFinalCurso1500.Controllers
             {
                 try
                 {
-                    _mapper.Map<CarDTO, Car>(carDTO, car);
-                    _context.Update(car);
+                    _mapper.Map<ConcessionaireDTO, Concessionaire>(concessionaireDTO, concessionaire);
+                    _context.Update(concessionaire);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CarExists(id))
+                    if (!ConcessionaireExists(id))
                     {
                         return NotFound();
                     }
@@ -124,51 +124,49 @@ namespace ProjetoFinalCurso1500.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
-            return View(car);
+            return View(concessionaire);
         }
 
-        // GET: Cars/Delete/5
+        // GET: Concessionaires/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.Concessionaires == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car
-                .Include(c => c.Concessionaire)
+            var concessionaire = await _context.Concessionaires
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (car == null)
+            if (concessionaire == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(concessionaire);
         }
 
-        // POST: Cars/Delete/5
+        // POST: Concessionaires/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Car == null)
+            if (_context.Concessionaires == null)
             {
-                return Problem("Entity set 'ProjetoFinalCurso1500Context.Car'  is null.");
+                return Problem("Entity set 'ProjetoFinalCurso1500Context.Concessionaires'  is null.");
             }
-            var car = await _context.Car.FindAsync(id);
-            if (car != null)
+            var concessionaire = await _context.Concessionaires.FindAsync(id);
+            if (concessionaire != null)
             {
-                _context.Car.Remove(car);
+                _context.Concessionaires.Remove(concessionaire);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CarExists(string id)
+        private bool ConcessionaireExists(string id)
         {
-          return (_context.Car?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Concessionaires?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

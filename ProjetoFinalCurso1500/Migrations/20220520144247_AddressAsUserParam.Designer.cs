@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoFinalCurso1500.Data;
 
@@ -11,9 +12,10 @@ using ProjetoFinalCurso1500.Data;
 namespace ProjetoFinalCurso1500.Migrations
 {
     [DbContext(typeof(ProjetoFinalCurso1500Context))]
-    partial class ProjetoFinalCurso1500ContextModelSnapshot : ModelSnapshot
+    [Migration("20220520144247_AddressAsUserParam")]
+    partial class AddressAsUserParam
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,10 +345,6 @@ namespace ProjetoFinalCurso1500.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

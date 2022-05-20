@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ProjetoFinalCurso1500Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ProjetoFinalCurso1500Context") ?? throw new InvalidOperationException("Connection string 'ProjetoFinalCurso1500Context' not found.")));
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 builder.Services.AddIdentity<User, IdentityRole>(
@@ -16,6 +17,17 @@ options =>
     options.SignIn.RequireConfirmedAccount = false;
 }
 ).AddEntityFrameworkStores<ProjetoFinalCurso1500Context>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+    options.SlidingExpiration = true;
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

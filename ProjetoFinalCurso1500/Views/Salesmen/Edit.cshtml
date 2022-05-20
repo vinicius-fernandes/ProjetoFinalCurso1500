@@ -1,4 +1,4 @@
-﻿@model ProjetoFinalCurso1500.Models.CarDTO
+﻿@model ProjetoFinalCurso1500.Models.SalesmanDTO
 
 @{
     ViewData["Title"] = "Edit";
@@ -6,26 +6,18 @@
 
 <h1>Edit</h1>
 
-<h4>Car</h4>
+<h4>Salesman</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserId" />
+     
             <div class="form-group">
-                <label asp-for="Model" class="control-label"></label>
-                <input asp-for="Model" class="form-control" />
-                <span asp-validation-for="Model" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
+                <label asp-for="Salarie" class="control-label"></label>
+                <input asp-for="Salarie" class="form-control" />
+                <span asp-validation-for="Salarie" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="IdConcessionaire" class="control-label"></label>

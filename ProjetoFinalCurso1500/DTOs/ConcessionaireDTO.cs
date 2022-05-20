@@ -1,8 +1,7 @@
 ﻿namespace ProjetoFinalCurso1500.Models
 {
-    public class Concessionaire
+    public class ConcessionaireDTO
     {
-        public string Id { get; set; }
         public string Name { get; set; }
 
         public virtual ICollection<Client>? Clients { get; set; }

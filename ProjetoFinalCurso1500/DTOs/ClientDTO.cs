@@ -1,8 +1,8 @@
 ﻿namespace ProjetoFinalCurso1500.Models
 {
-    public class Client
+    public class ClientDTO
     {
-        public string Id { get; set; }
+
         public string UserId { get; set; }
 
         public virtual User User { get; set; }

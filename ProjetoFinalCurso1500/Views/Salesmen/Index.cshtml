@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ProjetoFinalCurso1500.Models.Car>
+﻿@model IEnumerable<ProjetoFinalCurso1500.Models.Salesman>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,13 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Model)
+                @Html.DisplayNameFor(model => model.User)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Amount)
+                @Html.DisplayNameFor(model => model.Salarie)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Concessionaire)
@@ -31,13 +28,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Model)
+                @Html.DisplayFor(modelItem => item.User.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
+                @Html.DisplayFor(modelItem => item.Salarie)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Concessionaire.Name)

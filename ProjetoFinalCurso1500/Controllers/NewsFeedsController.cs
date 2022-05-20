@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,94 +10,87 @@ using ProjetoFinalCurso1500.Models;
 
 namespace ProjetoFinalCurso1500.Controllers
 {
-    public class CarsController : Controller
+    public class NewsFeedsController : Controller
     {
         private readonly ProjetoFinalCurso1500Context _context;
-        private readonly IMapper _mapper;
-        public CarsController(ProjetoFinalCurso1500Context context, IMapper mapper)
+
+        public NewsFeedsController(ProjetoFinalCurso1500Context context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        // GET: Cars
+        // GET: NewsFeeds
         public async Task<IActionResult> Index()
         {
-            var projetoFinalCurso1500Context = _context.Car.Include(c => c.Concessionaire);
-            return View(await projetoFinalCurso1500Context.ToListAsync());
+              return _context.NewsFeed != null ? 
+                          View(await _context.NewsFeed.ToListAsync()) :
+                          Problem("Entity set 'ProjetoFinalCurso1500Context.NewsFeed'  is null.");
         }
 
-        // GET: Cars/Details/5
+        // GET: NewsFeeds/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.NewsFeed == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car
-                .Include(c => c.Concessionaire)
+            var newsFeed = await _context.NewsFeed
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (car == null)
+            if (newsFeed == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(newsFeed);
         }
 
-        // GET: Cars/Create
+        // GET: NewsFeeds/Create
         public IActionResult Create()
         {
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name");
             return View();
         }
 
-        // POST: Cars/Create
+        // POST: NewsFeeds/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
+        public async Task<IActionResult> Create([Bind("Id,Title,Content,Image")] NewsFeed newsFeed)
         {
             if (ModelState.IsValid)
             {
-                var car = _mapper.Map<Car>(carDTO);
-                car.Id = Guid.NewGuid().ToString();
-                _context.Add(car);
+                _context.Add(newsFeed);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
-            return View(carDTO);
+            return View(newsFeed);
         }
 
-        // GET: Cars/Edit/5
+        // GET: NewsFeeds/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.NewsFeed == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car.FindAsync(id);
-            if (car == null)
+            var newsFeed = await _context.NewsFeed.FindAsync(id);
+            if (newsFeed == null)
             {
                 return NotFound();
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", car.IdConcessionaire);
-            return View(_mapper.Map<CarDTO>(car));
+            return View(newsFeed);
         }
 
-        // POST: Cars/Edit/5
+        // POST: NewsFeeds/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,Content,Image")] NewsFeed newsFeed)
         {
-            var car = _context.Car.Find(id);
-            if (car ==null)
+            if (id != newsFeed.Id)
             {
                 return NotFound();
             }
@@ -107,13 +99,12 @@ namespace ProjetoFinalCurso1500.Controllers
             {
                 try
                 {
-                    _mapper.Map<CarDTO, Car>(carDTO, car);
-                    _context.Update(car);
+                    _context.Update(newsFeed);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CarExists(id))
+                    if (!NewsFeedExists(newsFeed.Id))
                     {
                         return NotFound();
                     }
@@ -124,51 +115,49 @@ namespace ProjetoFinalCurso1500.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
-            return View(car);
+            return View(newsFeed);
         }
 
-        // GET: Cars/Delete/5
+        // GET: NewsFeeds/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.Car == null)
+            if (id == null || _context.NewsFeed == null)
             {
                 return NotFound();
             }
 
-            var car = await _context.Car
-                .Include(c => c.Concessionaire)
+            var newsFeed = await _context.NewsFeed
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (car == null)
+            if (newsFeed == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(newsFeed);
         }
 
-        // POST: Cars/Delete/5
+        // POST: NewsFeeds/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Car == null)
+            if (_context.NewsFeed == null)
             {
-                return Problem("Entity set 'ProjetoFinalCurso1500Context.Car'  is null.");
+                return Problem("Entity set 'ProjetoFinalCurso1500Context.NewsFeed'  is null.");
             }
-            var car = await _context.Car.FindAsync(id);
-            if (car != null)
+            var newsFeed = await _context.NewsFeed.FindAsync(id);
+            if (newsFeed != null)
             {
-                _context.Car.Remove(car);
+                _context.NewsFeed.Remove(newsFeed);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CarExists(string id)
+        private bool NewsFeedExists(string id)
         {
-          return (_context.Car?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.NewsFeed?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
