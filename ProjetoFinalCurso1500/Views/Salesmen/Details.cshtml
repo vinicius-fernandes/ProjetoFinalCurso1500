@@ -1,0 +1,36 @@
+﻿@model ProjetoFinalCurso1500.Models.Salesman
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="display-6">Details</h1>
+
+<div>
+    <h4>Vendedor</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.User.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Salarie)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Salarie)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Concessionaire)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Concessionaire.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index" class="btn btn-primary">Voltar para a listagem</a>
+
+</div>

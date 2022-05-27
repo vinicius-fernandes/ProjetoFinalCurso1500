@@ -1,0 +1,47 @@
+﻿@model IEnumerable<ProjetoFinalCurso1500.Models.Salesman>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Vendedor</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Criar novo</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Salarie)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Concessionaire)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Salarie)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Concessionaire.Name)
+            </td>
+            <td>
+                   <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary mr-1">Editar</a> 
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary mr-1">Detalhes</a> 
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger mr-1">Deletar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

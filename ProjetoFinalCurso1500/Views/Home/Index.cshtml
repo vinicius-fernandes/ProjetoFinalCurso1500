@@ -1,8 +1,26 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
+
+    var newsFeeds = ViewData["NewsFeeds"] as List<NewsFeed>;
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Bem vindo</h1>
+
+
+    
 </div>
+    <div>
+        <h5 class="display-6">Veja abaixo nossas últimas noticias</h5>
+    @foreach(var news in newsFeeds ?? new List<NewsFeed>())
+    {
+    <div class="card" >
+          <div class="card-body">
+            <h5 class="card-title">@news.Title</h5>
+            <p class="card-text">@news.Content</p>
+            <a href="/NewsFeeds/Details?id=@news.Id" class="btn btn-primary">Ver noticia completa</a>
+          </div>
+        </div>
+    }
+    <a href="/NewsFeeds/Index" class="btn btn-primary mt-2">Visualizar mais noticiais</a>
+    </div>
