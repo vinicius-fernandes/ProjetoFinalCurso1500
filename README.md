@@ -3,3 +3,5 @@ Utilizando:
 - Asp .Net Core
 - Javascript
 - Razors
+- Entity Framework
+- Identity Framework
