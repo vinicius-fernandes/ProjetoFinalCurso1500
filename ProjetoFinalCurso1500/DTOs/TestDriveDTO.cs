@@ -12,12 +12,18 @@ namespace ProjetoFinalCurso1500.Models
         public virtual Concessionaire? Concessionaire { get; set; }
 
         public virtual Car? Car { get; set; }
-
+        [Required(ErrorMessage = "Selecione um carro!")]
+        [Display(Name = "Carro")]
         public string IdCar { get; set; }
+        [Required(ErrorMessage = "Selecione uma concessionária!")]
         [Display(Name ="Concessionária")]
         public string IdConcessionaire { get; set; }
+        [Required(ErrorMessage = "Selecione um cliente!")]
         [Display(Name = "Cliente")]
         public string? IdClient { get; set; }
+        [Required(ErrorMessage ="Selecione um vendedor!")]
+        [Display(Name = "Vendedor")]
+        public string? IdSalesman { get; set; }
 
     }
 }

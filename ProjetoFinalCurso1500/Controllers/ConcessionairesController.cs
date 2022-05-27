@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using ProjetoFinalCurso1500.Models;
 
 namespace ProjetoFinalCurso1500.Controllers
 {
+    [Authorize(Policy = "Admin")]
     public class ConcessionairesController : Controller
     {
         private readonly ProjetoFinalCurso1500Context _context;

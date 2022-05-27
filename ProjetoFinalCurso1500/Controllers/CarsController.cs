@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using ProjetoFinalCurso1500.Models;
 
 namespace ProjetoFinalCurso1500.Controllers
 {
+    [Authorize]
     public class CarsController : Controller
     {
         private readonly ProjetoFinalCurso1500Context _context;
@@ -20,6 +22,7 @@ namespace ProjetoFinalCurso1500.Controllers
             _context = context;
             _mapper = mapper;
         }
+        [Authorize(Policy = "SalesmanAllowed")]
 
         // GET: Cars
         public async Task<IActionResult> Index()
@@ -27,6 +30,7 @@ namespace ProjetoFinalCurso1500.Controllers
             var projetoFinalCurso1500Context = _context.Car.Include(c => c.Concessionaire);
             return View(await projetoFinalCurso1500Context.ToListAsync());
         }
+        [Authorize(Policy = "SalesmanAllowed")]
 
         // GET: Cars/Details/5
         public async Task<IActionResult> Details(string id)
@@ -46,6 +50,13 @@ namespace ProjetoFinalCurso1500.Controllers
 
             return View(car);
         }
+        [Authorize]
+        public List<SelectListItem> GetCarsForConcessionaire(string idConcessionaire)
+        {
+   
+            return _context.Car.Where(c => c.IdConcessionaire == idConcessionaire).Select(c=>new SelectListItem {Value=c.Id,Text=c.Model}).ToList();
+        }
+        [Authorize(Policy = "SalesmanAllowed")]
 
         // GET: Cars/Create
         public IActionResult Create()
@@ -59,6 +70,8 @@ namespace ProjetoFinalCurso1500.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> Create([Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
         {
             if (ModelState.IsValid)
@@ -74,6 +87,8 @@ namespace ProjetoFinalCurso1500.Controllers
         }
 
         // GET: Cars/Edit/5
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Car == null)
@@ -95,6 +110,8 @@ namespace ProjetoFinalCurso1500.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> Edit(string id, [Bind("Model,Price,Amount,IdConcessionaire")] CarDTO carDTO)
         {
             var car = _context.Car.Find(id);
@@ -127,7 +144,7 @@ namespace ProjetoFinalCurso1500.Controllers
             ViewData["IdConcessionaire"] = new SelectList(_context.Concessionaires, "Id", "Name", carDTO.IdConcessionaire);
             return View(car);
         }
-
+        [Authorize(Policy = "SalesmanAllowed")]
         // GET: Cars/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -150,6 +167,8 @@ namespace ProjetoFinalCurso1500.Controllers
         // POST: Cars/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Car == null)
@@ -165,6 +184,7 @@ namespace ProjetoFinalCurso1500.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        [NonAction]
 
         private bool CarExists(string id)
         {

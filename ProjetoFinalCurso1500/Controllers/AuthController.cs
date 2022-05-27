@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjetoFinalCurso1500.Data;
 using ProjetoFinalCurso1500.Models;
 using ProjetoFinalCurso1500.Models.Auth;
+using System.Security.Claims;
 
 namespace AppCurso1500.Controllers
 {
@@ -41,6 +43,15 @@ namespace AppCurso1500.Controllers
                     _context.Add(client);
                     await _context.SaveChangesAsync();
 
+                    List<Claim> newClaims = new List<Claim>();
+
+                    var newUserClaim = new Claim("userType", "Salesman");
+
+
+
+
+                    newClaims.Add(newUserClaim);
+                    await _userManager.AddClaimsAsync(user, newClaims);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
@@ -70,7 +81,25 @@ namespace AppCurso1500.Controllers
                 var result = await _signInManager.PasswordSignInAsync(login.Email, login.Password, login.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+
+                    var userId = _userManager.GetUserId(HttpContext.User);
+
+
+                    var client = await _context.Client.FirstOrDefaultAsync(c => c.UserId == userId);
+                    var salesman =await _context.Salesman.FirstOrDefaultAsync(c => c.UserId == userId);
+
+                    string clientId = client != null ? client.Id : "";
+                    string salesmanId = salesman != null ? salesman.Id : "";
+
+                    HttpContext.Session.SetString("ClientId", clientId);
+
+                    HttpContext.Session.SetString("SalesmanId", salesmanId);
+
+
+
                     return RedirectToAction("Index", "Home");
+
+
 
                 }
 

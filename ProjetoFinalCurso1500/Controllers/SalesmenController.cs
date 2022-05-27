@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +18,16 @@ namespace ProjetoFinalCurso1500.Controllers
     {
         private readonly ProjetoFinalCurso1500Context _context;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
-        public SalesmenController(ProjetoFinalCurso1500Context context, IMapper mapper)
+        public SalesmenController(ProjetoFinalCurso1500Context context, IMapper mapper, UserManager<User> userManager)
         {
             _context = context;
             _mapper = mapper;
+            _userManager = userManager;
+
         }
+        [Authorize(Policy = "Admin")]
 
         // GET: Salesmen
         public async Task<IActionResult> Index()
@@ -28,6 +35,7 @@ namespace ProjetoFinalCurso1500.Controllers
             var projetoFinalCurso1500Context = _context.Salesman.Include(s => s.Concessionaire).Include(s => s.User);
             return View(await projetoFinalCurso1500Context.ToListAsync());
         }
+        [Authorize(Policy = "Admin")]
 
         // GET: Salesmen/Details/5
         public async Task<IActionResult> Details(string id)
@@ -48,6 +56,15 @@ namespace ProjetoFinalCurso1500.Controllers
 
             return View(salesman);
         }
+        [Authorize]
+
+        public List<SelectListItem> GetSalesmenForConcessionaire(string idConcessionaire)
+        {
+
+            return _context.Salesman.Include(c=>c.User).Where(c => c.IdConcessionaire == idConcessionaire).Select(c => new SelectListItem { Value = c.Id, Text = c.User.Name }).ToList();
+        }
+
+        [Authorize(Policy = "Admin")]
 
         // GET: Salesmen/Create
         public IActionResult Create()
@@ -62,13 +79,35 @@ namespace ProjetoFinalCurso1500.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "Admin")]
+
         public async Task<IActionResult> Create([Bind("UserId,Salarie,IdConcessionaire")] SalesmanDTO salesmanDTO)
         {
+            var user = _context.Users.Find(salesmanDTO.UserId);
+            if (user == null)
+                return NotFound();
             if (ModelState.IsValid)
             {
                 var salesman = _mapper.Map<Salesman>(salesmanDTO);
                 salesman.Id = Guid.NewGuid().ToString();
+               
                 _context.Add(salesman);
+
+
+                if (_context.Client.Any(c => c.UserId == salesman.UserId))
+                {
+                    var client = _context.Client.FirstOrDefault(c => c.UserId == salesman.UserId);
+                    _context.Remove(client);
+                }
+
+                var claims = await _userManager.GetClaimsAsync(user);
+                List<Claim> newClaims = new List<Claim> { new Claim("userType", "Salesman") };
+
+           
+                await _userManager.RemoveClaimsAsync(user, claims);
+                await _userManager.AddClaimsAsync(user, newClaims);
+
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -78,6 +117,8 @@ namespace ProjetoFinalCurso1500.Controllers
         }
 
         // GET: Salesmen/Edit/5
+        [Authorize(Policy = "Admin")]
+
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Salesman == null)
@@ -100,6 +141,8 @@ namespace ProjetoFinalCurso1500.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "Admin")]
+
         public async Task<IActionResult> Edit(string id, [Bind("UserId,Salarie,IdConcessionaire")] SalesmanDTO salesmanDTO)
         {
             var salesman = _context.Salesman.Find(id);
@@ -136,6 +179,8 @@ namespace ProjetoFinalCurso1500.Controllers
         }
 
         // GET: Salesmen/Delete/5
+        [Authorize(Policy = "Admin")]
+
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Salesman == null)
@@ -158,6 +203,8 @@ namespace ProjetoFinalCurso1500.Controllers
         // POST: Salesmen/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "Admin")]
+
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Salesman == null)
@@ -174,6 +221,7 @@ namespace ProjetoFinalCurso1500.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [NonAction]
         private bool SalesmanExists(string id)
         {
           return (_context.Salesman?.Any(e => e.Id == id)).GetValueOrDefault();

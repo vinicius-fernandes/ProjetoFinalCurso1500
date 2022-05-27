@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjetoFinalCurso1500.Data;
 using ProjetoFinalCurso1500.Models;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjetoFinalCurso1500.Controllers
 {
     public class NewsFeedsController : Controller
     {
         private readonly ProjetoFinalCurso1500Context _context;
+        private readonly IMapper _mapper;
 
-        public NewsFeedsController(ProjetoFinalCurso1500Context context)
+        public NewsFeedsController(ProjetoFinalCurso1500Context context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
+
         }
 
         // GET: NewsFeeds
@@ -44,6 +49,7 @@ namespace ProjetoFinalCurso1500.Controllers
 
             return View(newsFeed);
         }
+        [Authorize(Policy = "SalesmanAllowed")]
 
         // GET: NewsFeeds/Create
         public IActionResult Create()
@@ -56,18 +62,25 @@ namespace ProjetoFinalCurso1500.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,Image")] NewsFeed newsFeed)
+        [Authorize(Policy = "SalesmanAllowed")]
+
+        public async Task<IActionResult> Create([Bind("Title,Content,Image")] NewsFeedDTO newsFeedDTO)
         {
             if (ModelState.IsValid)
             {
+                var newsFeed = _mapper.Map<NewsFeed>(newsFeedDTO);
+                newsFeed.Id = Guid.NewGuid().ToString();
+                newsFeed.Data = DateTime.Now;
                 _context.Add(newsFeed);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(newsFeed);
+            return View(newsFeedDTO);
         }
 
         // GET: NewsFeeds/Edit/5
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.NewsFeed == null)
@@ -80,7 +93,7 @@ namespace ProjetoFinalCurso1500.Controllers
             {
                 return NotFound();
             }
-            return View(newsFeed);
+            return View(_mapper.Map<NewsFeedDTO>(newsFeed));
         }
 
         // POST: NewsFeeds/Edit/5
@@ -88,9 +101,12 @@ namespace ProjetoFinalCurso1500.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,Content,Image")] NewsFeed newsFeed)
+        [Authorize(Policy = "SalesmanAllowed")]
+
+        public async Task<IActionResult> Edit(string id, [Bind("Title,Content,Image")] NewsFeedDTO newsFeedDTO)
         {
-            if (id != newsFeed.Id)
+            var newsFeed = await _context.NewsFeed.FindAsync(id);
+            if (newsFeed==null)
             {
                 return NotFound();
             }
@@ -99,6 +115,7 @@ namespace ProjetoFinalCurso1500.Controllers
             {
                 try
                 {
+                    _mapper.Map<NewsFeedDTO,NewsFeed>(newsFeedDTO, newsFeed);
                     _context.Update(newsFeed);
                     await _context.SaveChangesAsync();
                 }
@@ -119,6 +136,8 @@ namespace ProjetoFinalCurso1500.Controllers
         }
 
         // GET: NewsFeeds/Delete/5
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.NewsFeed == null)
@@ -139,6 +158,8 @@ namespace ProjetoFinalCurso1500.Controllers
         // POST: NewsFeeds/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "SalesmanAllowed")]
+
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.NewsFeed == null)
@@ -154,7 +175,7 @@ namespace ProjetoFinalCurso1500.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        [NonAction]
         private bool NewsFeedExists(string id)
         {
           return (_context.NewsFeed?.Any(e => e.Id == id)).GetValueOrDefault();
